@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings - Sam's Halal Food Restaurant{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">My Bookings</h1>
+    
+    {% if bookings %}
+        <div class="row">
+            {% for booking in bookings %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %} text-white">
+                            <h5 class="mb-0">{{ booking.date }} at {{ booking.time }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Booking ID:</strong> {{ booking.id }}</p>
+                            <p><strong>Name:</strong> {{ booking.customer_name }}</p>
+                            <p><strong>Guests:</strong> {{ booking.number_of_guests }}</p>
+                            <p><strong>Status:</strong> {{ booking.status|title }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'booking_detail' booking_id=booking.id %}" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p class="mb-0">You don't have any upcoming bookings.</p>
+        </div>
+    {% endif %}
+    
+    <div class="text-center mt-4">
+        <a href="{% url 'booking_create' %}" class="btn btn-primary btn-lg">Make a New Booking</a>
+    </div>
+</div>
+{% endblock %}
+
