@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Sam's Halal Food Restaurant - Book a Table{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-form {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .availability-feedback {
+        display: none;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-4">Book a Table</h1>
+            
+            <div class="booking-form">
+                <form method="post" id="booking-form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.customer_name.id_for_label }}">Name</label>
+                                {{ form.customer_name }}
+                                {% if form.customer_name.errors %}
+                                    <div class="text-danger">{{ form.customer_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.customer_phone.id_for_label }}">Phone</label>
+                                {{ form.customer_phone }}
+                                {% if form.customer_phone.errors %}
+                                    <div class="text-danger">{{ form.customer_phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.customer_email.id_for_label }}">Email</label>
+                        {{ form.customer_email }}
+                        {% if form.customer_email.errors %}
+                            <div class="text-danger">{{ form.customer_email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.date.id_for_label }}">Date</label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <div class="text-danger">{{ form.date.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.time.id_for_label }}">Time</label>
+                                {{ form.time }}
+                                {% if form.time.errors %}
+                                    <div class="text-danger">{{ form.time.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.number_of_guests.id_for_label }}">Number of Guests</label>
+                                {{ form.number_of_guests }}
+                                {% if form.number_of_guests.errors %}
+                                    <div class="text-danger">{{ form.number_of_guests.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.special_requests.id_for_label }}">Special Requests</label>
+                        {{ form.special_requests }}
+                        {% if form.special_requests.errors %}
+                            <div class="text-danger">{{ form.special_requests.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="alert alert-success availability-feedback" id="available-feedback">
+                        <i class="fas fa-check-circle me-2"></i> Tables are available for your party at this time!
+                    </div>
+                    
+                    <div class="alert alert-danger availability-feedback" id="unavailable-feedback">
+                        <i class="fas fa-times-circle me-2"></i> <span id="unavailable-message"></span>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" id="check-availability" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-search me-2"></i>Check Availability
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-check me-2"></i>Book Now
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Check availability button click handler
+        $('#check-availability').click(function() {
+            const date = $('#{{ form.date.id_for_label }}').val();
+            const time = $('#{{ form.time.id_for_label }}').val();
+            const guests = $('#{{ form.number_of_guests.id_for_label }}').val();
+            
+            if (!date || !time || !guests) {
+                alert('Please fill in date, time, and number of guests to check availability.');
+                return;
+            }
+            
+            // Hide any previous feedback
+            $('.availability-feedback').hide();
+            
+            // Make AJAX request to check availability
+            $.ajax({
+                url: '{% url "check_availability" %}',
+                data: {
+                    'date': date,
+                    'time': time,
+                    'guests': guests
+                },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.available) {
+                        $('#available-feedback').show();
+                    } else {
+                        $('#unavailable-message').text(data.message);
+                        $('#unavailable-feedback').show();
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while checking availability. Please try again.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+

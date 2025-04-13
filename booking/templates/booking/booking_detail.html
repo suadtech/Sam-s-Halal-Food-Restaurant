@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Sam's Halal Food Restaurant - Booking Details{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Booking Details</h2>
+                </div>
+                <div class="card-body">
+                    {% if booking %}
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Booking Information</h5>
+                                <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+                                <p><strong>Status:</strong> 
+                                    {% if booking.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif booking.status == 'confirmed' %}
+                                        <span class="badge bg-success">Confirmed</span>
+                                    {% elif booking.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    {% elif booking.status == 'completed' %}
+                                        <span class="badge bg-info">Completed</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Date:</strong> {{ booking.date }}</p>
+                                <p><strong>Time:</strong> {{ booking.time }}</p>
+                                <p><strong>Number of Guests:</strong> {{ booking.number_of_guests }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Customer Information</h5>
+                                <p><strong>Name:</strong> {{ booking.customer_name }}</p>
+                                <p><strong>Email:</strong> {{ booking.customer_email }}</p>
+                                <p><strong>Phone:</strong> {{ booking.customer_phone }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if booking.tables.all %}
+                            <h5>Reserved Tables</h5>
+                            <ul class="list-group mb-4">
+                                {% for table in booking.tables.all %}
+                                    <li class="list-group-item">{{ table }} </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        
+                        {% if booking.special_requests %}
+                            <h5>Special Requests</h5>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    {{ booking.special_requests }}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'booking_list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to My Bookings
+                            </a>
+                            
+                            {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                    <i class="fas fa-times-circle me-2"></i>Cancel Booking
+                                </button>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Cancel Modal -->
+                        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="cancelModalLabel">Cancel Booking</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to cancel your booking for {{ booking.date }} at {{ booking.time }}?</p>
+                                        <p class="text-danger">This action cannot be undone.</p>
+                                        
+                                        <form method="post" action="{% url 'booking_cancel' %}">
+                                            {% csrf_token %}
+                                            {{ cancellation_form.booking_id }}
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input" type="checkbox" id="{{ cancellation_form.confirmation.id_for_label }}" name="{{ cancellation_form.confirmation.html_name }}" required>
+                                                <label class="form-check-label" for="{{ cancellation_form.confirmation.id_for_label }}">
+                                                    {{ cancellation_form.confirmation.label }}
+                                                </label>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-times-circle me-2"></i>Confirm Cancellation
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <p>Booking not found.</p>
+                        </div>
+                        <a href="{% url 'booking_list' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to My Bookings
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
