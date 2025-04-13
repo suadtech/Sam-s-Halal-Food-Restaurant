@@ -8,8 +8,8 @@ from .models import Restaurant, Table, MenuItem, MenuCategory, Booking
 from .forms import BookingForm, CancellationForm
 import datetime
 
-# Create your views here.
-def home(request) :
+def home(request):
+    """View for the homepage."""
     try:
         restaurant = Restaurant.objects.first()
     except Restaurant.DoesNotExist:
@@ -19,6 +19,7 @@ def home(request) :
         'restaurant': restaurant,
     }
     return render(request, 'booking/home.html', context)
+
 def menu(request):
     """View for displaying the restaurant menu."""
     categories = MenuCategory.objects.all()
@@ -26,19 +27,21 @@ def menu(request):
         'categories': categories,
     }
     return render(request, 'booking/menu.html', context)
+
 def booking_create(request):
+    """View for creating a new booking."""
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
             booking = form.save(commit=False)
             booking.status = 'pending'
             booking.save()
-
+            
             # Assign tables to the booking
             date = form.cleaned_data['date']
             time = form.cleaned_data['time']
             number_of_guests = form.cleaned_data['number_of_guests']
-
+            
             # Get available tables
             available_tables = form.get_available_tables(date, time)
             
@@ -48,13 +51,15 @@ def booking_create(request):
             # Assign tables to accommodate the number of guests
             remaining_guests = number_of_guests
             assigned_tables = []
+            
             for table in available_tables:
                 if remaining_guests <= 0:
                     break
                 
                 assigned_tables.append(table)
                 remaining_guests -= table.capacity
-                 # Add tables to the booking
+            
+            # Add tables to the booking
             for table in assigned_tables:
                 booking.tables.add(table)
             
@@ -69,6 +74,7 @@ def booking_create(request):
     return render(request, 'booking/booking_form.html', context)
 
 def booking_detail(request, booking_id):
+    """View for displaying booking details."""
     booking = get_object_or_404(Booking, id=booking_id)
     cancellation_form = CancellationForm(initial={'booking_id': booking.id})
     
@@ -79,6 +85,9 @@ def booking_detail(request, booking_id):
     return render(request, 'booking/booking_detail.html', context)
 
 def booking_list(request):
+    """View for listing user's bookings."""
+    # In a real application, this would filter by the logged-in user
+    # For now, we'll just show all bookings
     bookings = Booking.objects.filter(
         date__gte=timezone.now().date()
     ).order_by('date', 'time')
@@ -90,12 +99,13 @@ def booking_list(request):
 
 @require_POST
 def booking_cancel(request):
-     form = CancellationForm(request.POST)
-     if form.is_valid():
+    """View for cancelling a booking."""
+    form = CancellationForm(request.POST)
+    if form.is_valid():
         booking_id = form.cleaned_data['booking_id']
         booking = get_object_or_404(Booking, id=booking_id)
-
-         # Only allow cancellation of pending or confirmed bookings
+        
+        # Only allow cancellation of pending or confirmed bookings
         if booking.status in ['pending', 'confirmed']:
             booking.status = 'cancelled'
             booking.save()
@@ -109,9 +119,11 @@ def booking_cancel(request):
         
         return redirect('booking_list')
     
-     messages.error(request, 'Invalid form submission.')
-     return redirect('booking_list')
+    messages.error(request, 'Invalid form submission.')
+    return redirect('booking_list')
+
 def check_availability(request):
+    """AJAX view for checking table availability."""
     if request.method == 'GET':
         date_str = request.GET.get('date')
         time_str = request.GET.get('time')
@@ -126,6 +138,7 @@ def check_availability(request):
             guests = int(guests)
         except (ValueError, TypeError):
             return JsonResponse({'available': False, 'message': 'Invalid parameters'})
+        
         # Check if date is in the past
         if date < timezone.now().date():
             return JsonResponse({'available': False, 'message': 'Cannot book for past dates'})
@@ -133,6 +146,7 @@ def check_availability(request):
         # If booking is today, check if time is in the past
         if date == timezone.now().date() and time < timezone.now().time():
             return JsonResponse({'available': False, 'message': 'Cannot book for past times'})
+        
         # Create a temporary form to use its get_available_tables method
         form = BookingForm()
         available_tables = form.get_available_tables(date, time)
@@ -152,4 +166,3 @@ def check_availability(request):
             })
     
     return JsonResponse({'available': False, 'message': 'Invalid request method'})
-        
