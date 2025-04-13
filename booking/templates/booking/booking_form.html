@@ -124,7 +124,13 @@
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function()  {
+    const form = document.getElementById('booking-form');
+    if (form) {
+      form.addEventListener('submit', function(event) {
+        console.log('Form submitted');
+      });
+    }
         // Check availability button click handler
         $('#check-availability').click(function() {
             const date = $('#{{ form.date.id_for_label }}').val();
