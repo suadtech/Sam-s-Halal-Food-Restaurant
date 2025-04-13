@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Sam's Halal Food Restaurant{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container text-center">
+        <h1>Welcome to Sam's Halal Food Restaurant</h1>
+        <p class="lead">Authentic Halal Cuisine for Every Taste</p>
+        <a href="{% url 'booking_create' %}" class="btn btn-primary btn-lg mt-3">Book a Table</a>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Our Story</h2>
+                <p>Sam's Halal Food Restaurant was founded with a passion for authentic halal cuisine. We take pride in serving delicious, high-quality halal food that respects traditional cooking methods while adding our unique touch.</p>
+                <p>Our chefs are dedicated to creating memorable dining experiences using only the finest halal ingredients. Every dish is prepared with care and attention to detail.</p>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Why Choose Us?</h3>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success me-2"></i> 100% Halal certified ingredients</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Authentic recipes from around the world</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Comfortable dining environment</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Excellent customer service</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Online booking system</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Menu Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Featured Menu Items</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Chicken Biryani</h5>
+                        <span class="halal-badge">Halal</span>
+                        <p class="card-text">Fragrant basmati rice cooked with tender chicken pieces and aromatic spices.</p>
+                        <p class="text-primary fw-bold">$14.99</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Lamb Kebabs</h5>
+                        <span class="halal-badge">Halal</span>
+                        <p class="card-text">Juicy lamb kebabs marinated in special spices and grilled to perfection.</p>
+                        <p class="text-primary fw-bold">$16.99</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Vegetable Curry</h5>
+                        <span class="halal-badge">Halal</span>
+                        <p class="card-text">Mixed vegetables cooked in a rich, flavorful curry sauce.</p>
+                        <p class="text-primary fw-bold">$12.99</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'menu' %}" class="btn btn-outline-primary">View Full Menu</a>
+        </div>
+    </div>
+</section>
+
+<!-- Booking CTA Section -->
+<section class="py-5">
+    <div class="container text-center">
+        <h2>Reserve Your Table Today</h2>
+        <p class="lead">Experience the best halal cuisine in town. Book your table now to avoid disappointment.</p>
+        <a href="{% url 'booking_create' %}" class="btn btn-primary btn-lg mt-3">Make a Reservation</a>
+    </div>
+</section>
+{% endblock %}
+
