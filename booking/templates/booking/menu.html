@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Menu - Sam's Halal Food Restaurant{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Our Menu</h1>
+    
+    {% if categories %}
+        {% for category in categories %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ category.name }}</h3>
+                    {% if category.description %}
+                        <p class="mb-0 small">{{ category.description }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if category.items.all %}
+                        {% for item in category.items.all %}
+                            <div class="menu-item">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5>
+                                            {{ item.name }}
+                                            {% if item.is_halal %}
+                                                <span class="halal-badge">Halal</span>
+                                            {% endif %}
+                                        </h5>
+                                        <p>{{ item.description }}</p>
+                                    </div>
+                                    <div class="col-md-4 text-md-end">
+                                        <p class="fw-bold">${{ item.price }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No items available in this category.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <p class="mb-0">Our menu is currently being updated. Please check back later.</p>
+        </div>
+    {% endif %}
+    
+    <div class="text-center mt-5">
+        <a href="{% url 'booking_create' %}" class="btn btn-primary btn-lg">Book a Table</a>
+    </div>
+</div>
+{% endblock %}
+
